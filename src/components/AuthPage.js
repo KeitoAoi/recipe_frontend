@@ -9,9 +9,11 @@ import {
   Button,
   Typography,
   Stack,
-  Box
+  Box,
+  Snackbar,
+  Alert
 } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../contexts/AuthContext';
 
 /* ---------- brand palette & helpers ---------- */
@@ -55,8 +57,16 @@ const AuthCard = ({ title, onSubmit, children }) => (
 
 /* ---------- main page ---------- */
 export function AuthPage() {
-  const navigate = useNavigate();
+  const navigate   = useNavigate();
+  const location   = useLocation();
   const { login, signup } = useContext(AuthContext);
+
+  /* snackbar for post‑signup notice */
+  const [snackOpen, setSnackOpen] = useState(Boolean(location.state?.registered));
+  const handleSnackClose = (_, reason) => {
+    if (reason === 'clickaway') return;
+    setSnackOpen(false);
+  };
 
   /* quick‑login form (top bar) */
   const [L, setL] = useState({ username: '', password: '' });
@@ -73,13 +83,31 @@ export function AuthPage() {
     e.preventDefault();
     if (S.password !== S.confirm) return alert('Passwords mismatch');
     signup(S.username, S.email, S.password)
-      .then(() => navigate('/'))
+      .then(() => {
+        /* redirect back to this page with flag */
+        navigate('/auth', { replace: true, state: { registered: true } });
+      })
       .catch(() => alert('Signup failed'));
   };
 
   return (
     <>
-    
+      {/* success snackbar */}
+      <Snackbar
+        open={snackOpen}
+        autoHideDuration={6000}
+        onClose={handleSnackClose}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={handleSnackClose}
+          severity="success"
+          sx={{ width: '100%' }}
+        >
+          Successfully registered! Please log in with your new credentials.
+        </Alert>
+      </Snackbar>
+
       {/* ────────── Top bar ────────── */}
       <AppBar position="static" sx={{ bgcolor: COLORS.surface, py: 1 }}>
         <Toolbar
@@ -87,7 +115,6 @@ export function AuthPage() {
           onSubmit={handleQuickLogin}
           sx={{ ml: 'auto', gap: 2 }}
         >
-          
           <TextField
             size="small"
             placeholder="Username or Email"
