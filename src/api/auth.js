@@ -3,7 +3,7 @@ import axios from "axios";
 
 // Create a single axios instance for your API
 export const api = axios.create({
-  baseURL: "http://localhost:8000/api/",
+  baseURL: "https://recipe-backend-g4n2.onrender.com/api/",
   headers: { "Content-Type": "application/json" },
 });
 api.interceptors.request.use(config => {
