@@ -37,6 +37,7 @@ export const AuthProvider = ({ children }) => {
 
     localStorage.setItem('accessToken',  access);
     localStorage.setItem('refreshToken', refresh);
+    alert('sucessfuly register,please enter username and password to login.');
     setUser({ access, refresh });
   };
 
